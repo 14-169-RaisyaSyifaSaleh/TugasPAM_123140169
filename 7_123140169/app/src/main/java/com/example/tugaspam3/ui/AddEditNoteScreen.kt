@@ -73,7 +73,7 @@ fun AddEditNoteScreen(
                 TopAppBar(
                     title = {
                         Text(
-                            text = if (noteId == null) "INITIALIZE_ENTRY" else "MODIFY_RECORD",
+                            text = if (noteId == null) "Add Note" else "Edit Note",
                             style = MaterialTheme.typography.labelLarge.copy(
                                 fontWeight = FontWeight.Black,
                                 letterSpacing = 2.sp
@@ -128,7 +128,7 @@ fun AddEditNoteScreen(
                 // Title Field
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text(
-                        "ENTRY_SUBJECT",
+                        "Title",
                         style = MaterialTheme.typography.labelSmall,
                         color = AuroraGreen,
                         fontWeight = FontWeight.Bold,
@@ -142,7 +142,7 @@ fun AddEditNoteScreen(
                             .clip(RoundedCornerShape(12.dp))
                             .background(if (isDark) MidnightBlue else IceBlue)
                             .border(1.dp, if (isDark) Color.White.copy(alpha = 0.05f) else Color.Transparent, RoundedCornerShape(12.dp)),
-                        placeholder = { Text("Enter subject...", color = (if (isDark) Color.White else Slate900).copy(alpha = 0.3f)) },
+                        placeholder = { Text("Enter title...", color = (if (isDark) Color.White else Slate900).copy(alpha = 0.3f)) },
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
                             unfocusedContainerColor = Color.Transparent,
@@ -160,7 +160,7 @@ fun AddEditNoteScreen(
                 // Content Field
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.weight(1f)) {
                     Text(
-                        "RAW_DATA_INPUT",
+                        "Content",
                         style = MaterialTheme.typography.labelSmall,
                         color = ElectricViolet,
                         fontWeight = FontWeight.Bold,
@@ -175,7 +175,7 @@ fun AddEditNoteScreen(
                             .clip(RoundedCornerShape(12.dp))
                             .background(if (isDark) MidnightBlue else IceBlue)
                             .border(1.dp, if (isDark) Color.White.copy(alpha = 0.05f) else Color.Transparent, RoundedCornerShape(12.dp)),
-                        placeholder = { Text("Stream your data here...", color = (if (isDark) Color.White else Slate900).copy(alpha = 0.3f)) },
+                        placeholder = { Text("Type something...", color = (if (isDark) Color.White else Slate900).copy(alpha = 0.3f)) },
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
                             unfocusedContainerColor = Color.Transparent,

@@ -74,7 +74,7 @@ fun EditProfileScreen(
                 TopAppBar(
                     title = { 
                         Text(
-                            "EDIT_IDENTITY",
+                            "Edit Profile",
                             style = MaterialTheme.typography.labelLarge.copy(
                                 fontWeight = FontWeight.Black,
                                 letterSpacing = 2.sp
@@ -134,15 +134,15 @@ fun EditProfileScreen(
                         .fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    CyberTextField(value = name, onValueChange = { name = it }, label = "USER_NAME", color = AuroraGreen, isDark = isDark)
-                    CyberTextField(value = nim, onValueChange = { nim = it }, label = "SERIAL_NIM", color = CyberCyan, isDark = isDark)
-                    CyberTextField(value = bio, onValueChange = { bio = it }, label = "BIO_DATA", color = ElectricViolet, isDark = isDark, singleLine = false)
+                    CyberTextField(value = name, onValueChange = { name = it }, label = "Full Name", color = AuroraGreen, isDark = isDark)
+                    CyberTextField(value = nim, onValueChange = { nim = it }, label = "NIM", color = CyberCyan, isDark = isDark)
+                    CyberTextField(value = bio, onValueChange = { bio = it }, label = "Bio", color = ElectricViolet, isDark = isDark, singleLine = false)
                     
                     Divider(color = if (isDark) Color.White.copy(alpha = 0.05f) else IceBlue, thickness = 1.dp)
                     
-                    CyberTextField(value = email, onValueChange = { email = it }, label = "UPLINK_MAIL", color = CyberCyan, isDark = isDark)
-                    CyberTextField(value = phone, onValueChange = { phone = it }, label = "COMM_LINE", color = ElectricViolet, isDark = isDark)
-                    CyberTextField(value = location, onValueChange = { location = it }, label = "NODE_LOC", color = NeonPink, isDark = isDark)
+                    CyberTextField(value = email, onValueChange = { email = it }, label = "Email", color = CyberCyan, isDark = isDark)
+                    CyberTextField(value = phone, onValueChange = { phone = it }, label = "Phone Number", color = ElectricViolet, isDark = isDark)
+                    CyberTextField(value = location, onValueChange = { location = it }, label = "Location", color = NeonPink, isDark = isDark)
                     
                     Spacer(modifier = Modifier.height(40.dp))
                 }

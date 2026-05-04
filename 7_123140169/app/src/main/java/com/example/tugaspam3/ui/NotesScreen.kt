@@ -92,14 +92,14 @@ fun NotesScreen(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "NETWORK_VAULT_v2",
+                        text = "NOTES APP",
                         style = MaterialTheme.typography.labelLarge,
                         color = AuroraGreen,
                         fontWeight = FontWeight.Black,
                         letterSpacing = 4.sp
                     )
                     Text(
-                        text = "System Logs",
+                        text = "My Notes",
                         style = MaterialTheme.typography.headlineLarge.copy(
                             fontWeight = FontWeight.Black,
                             letterSpacing = 1.sp
@@ -180,7 +180,7 @@ fun NotesScreen(
                     is NotesUiState.Empty -> {
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             Text(
-                                "NO DATA RECORDS FOUND", 
+                                "NO NOTES FOUND", 
                                 color = (if (isDark) Color.White else SlateDark).copy(alpha = 0.3f),
                                 fontWeight = FontWeight.Black,
                                 letterSpacing = 2.sp
@@ -267,7 +267,7 @@ fun ModernSearchBar(
             .border(1.dp, if (isDark) AuroraGreen.copy(alpha = 0.2f) else Color.Transparent, RoundedCornerShape(8.dp)),
         placeholder = { 
             Text(
-                "SEARCH_RECORDS...", 
+                "Search notes...",
                 color = (if (isDark) Color.White else SlateDark).copy(alpha = 0.3f),
                 fontWeight = FontWeight.Bold
             ) 

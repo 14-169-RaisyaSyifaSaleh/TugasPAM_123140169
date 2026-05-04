@@ -55,7 +55,7 @@ fun NoteDetailScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Text(
-                        "TERMINATE_ENTRY",
+                        "DELETE NOTE",
                         style = MaterialTheme.typography.labelLarge,
                         color = NeonPink,
                         fontWeight = FontWeight.Bold,
@@ -63,7 +63,7 @@ fun NoteDetailScreen(
                     )
 
                     Text(
-                        "Are you sure you want to delete this data record? This action is irreversible.",
+                        "Are you sure you want to delete this note? This action cannot be undone.",
                         style = MaterialTheme.typography.bodyMedium.copy(
                             color = (if (isDark) Color.White else Slate900).copy(alpha = 0.7f),
                             textAlign = TextAlign.Center
@@ -78,7 +78,7 @@ fun NoteDetailScreen(
                             onClick = { showDeleteDialog = false },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text("ABORT", color = if (isDark) Color.White else Slate900)
+                            Text("CANCEL", color = if (isDark) Color.White else Slate900)
                         }
                         Button(
                             onClick = {
@@ -90,7 +90,7 @@ fun NoteDetailScreen(
                             colors = ButtonDefaults.buttonColors(containerColor = NeonPink),
                             shape = RoundedCornerShape(12.dp)
                         ) {
-                            Text("CONFIRM", fontWeight = FontWeight.Bold)
+                            Text("DELETE", fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -121,7 +121,7 @@ fun NoteDetailScreen(
                 TopAppBar(
                     title = {
                         Text(
-                            "ENTRY_DETAILS",
+                            "NOTE DETAILS",
                             style = MaterialTheme.typography.labelLarge.copy(
                                 fontWeight = FontWeight.Black,
                                 letterSpacing = 2.sp
@@ -197,7 +197,7 @@ fun NoteDetailScreen(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("DATA NOT FOUND", color = NeonPink, fontWeight = FontWeight.Bold)
+                        Text("NOTE NOT FOUND", color = NeonPink, fontWeight = FontWeight.Bold)
                     }
                 }
             }

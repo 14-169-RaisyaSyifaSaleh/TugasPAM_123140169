@@ -56,7 +56,7 @@ fun SettingsScreen(
                 TopAppBar(
                     title = {
                         Text(
-                            "SYSTEM_CONFIG",
+                            "Settings",
                             style = MaterialTheme.typography.labelLarge.copy(
                                 fontWeight = FontWeight.Black,
                                 letterSpacing = 2.sp
@@ -98,7 +98,7 @@ fun SettingsScreen(
                     ) {
                         Column {
                             Text(
-                                "UI_MODE",
+                                "Appearance",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = AuroraGreen,
                                 fontWeight = FontWeight.Bold
@@ -123,7 +123,7 @@ fun SettingsScreen(
                 // Sort Order Section
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text(
-                        "DATA_INDEXING",
+                        "Sorting",
                         style = MaterialTheme.typography.labelSmall,
                         color = ElectricViolet,
                         fontWeight = FontWeight.Bold,
@@ -157,8 +157,8 @@ fun SettingsScreen(
                                     )
                                     Text(
                                         text = when(order) {
-                                            SortOrder.BY_TITLE -> "ALPHABETICAL_SORT"
-                                            SortOrder.BY_DATE -> "CHRONOLOGICAL_LOG"
+                                            SortOrder.BY_TITLE -> "Alphabetical"
+                                            SortOrder.BY_DATE -> "Date Created"
                                         },
                                         style = MaterialTheme.typography.bodyLarge,
                                         color = if (isSelected) (if (isDark) CyberCyan else Slate900) else (if (isDark) Color.White.copy(alpha = 0.5f) else Slate500),
@@ -174,7 +174,7 @@ fun SettingsScreen(
                 Spacer(modifier = Modifier.weight(1f))
                 
                 Text(
-                    "BUILD_VER: 2.0.4-AURORA",
+                    "Version 1.0.0",
                     style = MaterialTheme.typography.labelSmall,
                     color = (if (isDark) Color.White else Slate900).copy(alpha = 0.3f),
                     modifier = Modifier.align(Alignment.CenterHorizontally)

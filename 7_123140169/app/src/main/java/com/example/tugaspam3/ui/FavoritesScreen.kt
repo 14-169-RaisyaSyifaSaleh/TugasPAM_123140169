@@ -58,14 +58,14 @@ fun FavoritesScreen(
             ) {
                 Column {
                     Text(
-                        text = "PRIORITY_DECRYPT",
+                        text = "FAVORITES",
                         style = MaterialTheme.typography.labelLarge,
                         color = NeonPink,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 2.sp
                     )
                     Text(
-                        text = "Favorites",
+                        text = "Pinned Notes",
                         style = MaterialTheme.typography.headlineLarge.copy(
                             fontWeight = FontWeight.Black,
                             letterSpacing = 1.sp
@@ -88,7 +88,7 @@ fun FavoritesScreen(
                     if (favoriteNotes.isEmpty()) {
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             Text(
-                                "NO FAVORED LOGS FOUND.",
+                                "NO FAVORITE NOTES",
                                 color = (if (isDark) Color.White else SlateDark).copy(alpha = 0.3f),
                                 fontWeight = FontWeight.Black
                             )

@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tugaspam3.ui.theme.*
@@ -38,7 +39,6 @@ fun ProfileScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        // New Dynamic Background Elements
         if (isDark) {
             Box(
                 modifier = Modifier
@@ -68,55 +68,67 @@ fun ProfileScreen(
                 .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Modern Slanted Header
-            ProfileHeader(
-                imageUri = state.profileImageUri
-            )
+            ProfileHeader(imageUri = state.profileImageUri)
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Integrated Profile Card with new layout
             ProfileCard(state = state)
 
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
-            // Redesigned Action Row
+            // Mengurangi padding horizontal agar tombol punya ruang lebih luas
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 24.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    .padding(horizontal = 16.dp), 
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Button(
                     onClick = onEditClick,
                     modifier = Modifier
                         .weight(1f)
-                        .height(60.dp),
-                    shape = RoundedCornerShape(16.dp),
+                        .height(52.dp),
+                    shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (isDark) MidnightBlue else IceBlue,
                         contentColor = if (isDark) AuroraGreen else Slate900
-                    )
+                    ),
+                    contentPadding = PaddingValues(horizontal = 8.dp)
                 ) {
-                    Icon(Icons.Default.Edit, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("MANAGE", fontWeight = FontWeight.Black)
+                    Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        "EDIT", 
+                        fontWeight = FontWeight.Black,
+                        fontSize = 11.sp,
+                        maxLines = 1,
+                        softWrap = false,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
 
                 Button(
                     onClick = onSettingsClick,
                     modifier = Modifier
                         .weight(1f)
-                        .height(60.dp),
-                    shape = RoundedCornerShape(16.dp),
+                        .height(52.dp),
+                    shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = AuroraGreen,
                         contentColor = DeepSpace
-                    )
+                    ),
+                    contentPadding = PaddingValues(horizontal = 8.dp)
                 ) {
-                    Icon(Icons.Default.Settings, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("SYSTEM", fontWeight = FontWeight.Black)
+                    Icon(Icons.Default.Settings, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        "SETTINGS", 
+                        fontWeight = FontWeight.Black,
+                        fontSize = 11.sp,
+                        maxLines = 1,
+                        softWrap = false,
+                        overflow = TextOverflow.Ellipsis // PAKSA TETAP SATU BARIS
+                    )
                 }
             }
 

@@ -44,14 +44,14 @@ fun ProfileCard(state: ProfileUiState) {
             
             Column {
                 Text(
-                    text = "ID_IDENTIFIER",
+                    text = "PROFILE",
                     style = MaterialTheme.typography.labelSmall,
                     color = AuroraGreen,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 2.sp
                 )
                 Text(
-                    text = state.name.uppercase(),
+                    text = state.name,
                     style = MaterialTheme.typography.headlineMedium.copy(
                         fontWeight = FontWeight.Black,
                         letterSpacing = 1.sp
@@ -59,7 +59,7 @@ fun ProfileCard(state: ProfileUiState) {
                     color = if (isDark) Color.White else Slate900
                 )
                 Text(
-                    text = "SERIAL_NO: ${state.nim}",
+                    text = "NIM: ${state.nim}",
                     style = MaterialTheme.typography.titleMedium,
                     color = CyberCyan,
                     fontWeight = FontWeight.Medium
@@ -69,7 +69,7 @@ fun ProfileCard(state: ProfileUiState) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Bio Section (Terminal Style)
+        // Bio Section
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -84,7 +84,7 @@ fun ProfileCard(state: ProfileUiState) {
         ) {
             Column {
                 Text(
-                    text = "ACCESSING_MEMORIES...",
+                    text = "ABOUT ME",
                     style = MaterialTheme.typography.labelSmall,
                     color = ElectricViolet,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -100,9 +100,9 @@ fun ProfileCard(state: ProfileUiState) {
 
         Spacer(modifier = Modifier.height(40.dp))
         
-        // Grid-based Contact Info
+        // Contact Info
         Text(
-            "CORE_COMMUNICATIONS",
+            "CONTACT INFORMATION",
             style = MaterialTheme.typography.labelLarge,
             color = if (isDark) AuroraGreen else Slate500,
             fontWeight = FontWeight.Black,
@@ -113,7 +113,7 @@ fun ProfileCard(state: ProfileUiState) {
 
         InfoItem(
             icon = Icons.Default.Email,
-            title = "UPLINK_MAIL",
+            title = "Email Address",
             value = state.email,
             iconColor = CyberCyan,
             isDark = isDark
@@ -121,7 +121,7 @@ fun ProfileCard(state: ProfileUiState) {
         Spacer(modifier = Modifier.height(12.dp))
         InfoItem(
             icon = Icons.Default.Phone,
-            title = "SIGNAL_MOBILE",
+            title = "Phone Number",
             value = state.phone,
             iconColor = ElectricViolet,
             isDark = isDark
@@ -129,7 +129,7 @@ fun ProfileCard(state: ProfileUiState) {
         Spacer(modifier = Modifier.height(12.dp))
         InfoItem(
             icon = Icons.Default.LocationOn,
-            title = "NODE_LOCATION",
+            title = "Location",
             value = state.location,
             iconColor = NeonPink,
             isDark = isDark

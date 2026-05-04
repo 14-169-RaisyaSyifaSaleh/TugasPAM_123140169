@@ -41,6 +41,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val settingsViewModel: SettingsViewModel = koinViewModel()
             val isDarkMode by settingsViewModel.isDarkMode.collectAsState()
+
             val notesViewModel: NotesViewModel = koinViewModel()
             val profileViewModel: ProfileViewModel = koinViewModel()
 
@@ -61,7 +62,6 @@ fun MainApp(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
     val isDark = LocalIsDark.current
-    val isConnected by notesViewModel.isConnected.collectAsState()
 
     val bottomBarScreens = listOf(Screen.Notes, Screen.Favorites, Screen.Profile)
     val showBottomBar = currentDestination?.route in bottomBarScreens.map { it.route }
@@ -69,24 +69,6 @@ fun MainApp(
     Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         Scaffold(
             containerColor = Color.Transparent,
-            topBar = {
-                if (!isConnected) {
-                    Surface(
-                        color = Color.Red.copy(alpha = 0.8f),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            text = "No Internet Connection",
-                            color = Color.White,
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .fillMaxWidth(),
-                            style = MaterialTheme.typography.labelMedium,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                        )
-                    }
-                }
-            },
             bottomBar = {
                 if (showBottomBar) {
                     Box(
@@ -99,8 +81,8 @@ fun MainApp(
                                 .fillMaxWidth()
                                 .height(72.dp)
                                 .clip(RoundedCornerShape(32.dp))
-                                .border(1.dp, if (isDark) GlassBorder else LightBorder, RoundedCornerShape(32.dp)),
-                            color = if (isDark) GlassWhite else GlassBlack.copy(alpha = 0.05f),
+                                .border(1.dp, if (isDark) GlassBorder else SoftPink.copy(alpha = 0.2f), RoundedCornerShape(32.dp)),
+                            color = if (isDark) GlassWhite else Color.White.copy(alpha = 0.8f),
                             tonalElevation = 0.dp
                         ) {
                             Row(
@@ -140,7 +122,7 @@ fun MainApp(
                                                     .clip(CircleShape)
                                                     .background(
                                                         Brush.linearGradient(
-                                                            listOf(ElectricBlue.copy(alpha = 0.3f), SoftPurple.copy(alpha = 0.3f))
+                                                            listOf(SoftPink.copy(alpha = 0.3f), Lavender.copy(alpha = 0.3f))
                                                         )
                                                     )
                                             )
@@ -149,7 +131,7 @@ fun MainApp(
                                         Icon(
                                             imageVector = icon,
                                             contentDescription = null,
-                                            tint = if (isSelected) (if (isDark) Color.White else ElectricBlue) else (if (isDark) Color.White.copy(alpha = 0.4f) else SlateLight),
+                                            tint = if (isSelected) SoftPink else (if (isDark) Color.White.copy(alpha = 0.4f) else SlateLight),
                                             modifier = Modifier.size(24.dp)
                                         )
                                     }
@@ -170,9 +152,7 @@ fun MainApp(
                             .size(64.dp)
                             .clip(CircleShape)
                             .background(
-                                Brush.linearGradient(
-                                    listOf(ElectricBlue, SoftPurple)
-                                )
+                                Brush.linearGradient(PrimaryGradient)
                             )
                             .border(1.dp, GlassBorder, CircleShape)
                     ) {

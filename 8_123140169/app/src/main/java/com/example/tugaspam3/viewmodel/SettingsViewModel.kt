@@ -4,15 +4,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tugaspam3.data.SettingsManager
 import com.example.tugaspam3.data.SortOrder
+import com.example.tugaspam3.platform.BatteryInfo
 import com.example.tugaspam3.platform.DeviceInfo
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel for managing application settings and platform information.
+ * Injects DeviceInfo and BatteryInfo for UI display.
+ */
 class SettingsViewModel(
     private val settingsManager: SettingsManager,
-    val deviceInfo: DeviceInfo
+    val deviceInfo: DeviceInfo,
+    val batteryInfo: BatteryInfo
 ) : ViewModel() {
 
     val isDarkMode: StateFlow<Boolean> = settingsManager.isDarkMode

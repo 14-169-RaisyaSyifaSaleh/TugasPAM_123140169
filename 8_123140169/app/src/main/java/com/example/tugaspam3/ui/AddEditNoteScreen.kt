@@ -14,7 +14,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,6 +39,7 @@ fun AddEditNoteScreen(
 
     var title by remember { mutableStateOf("") }
     var content by remember { mutableStateOf("") }
+    val isDark = LocalIsDark.current
 
     LaunchedEffect(noteFromVm) {
         noteFromVm?.let {
@@ -48,51 +51,44 @@ fun AddEditNoteScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(DeepMidnight)
+            .background(MaterialTheme.colorScheme.background)
     ) {
-        // Background Glows
-        Box(
-            modifier = Modifier
-                .size(300.dp)
-                .offset(x = (-100).dp, y = (-50).dp)
-                .blur(100.dp)
-                .background(ElectricBlue.copy(alpha = 0.15f), CircleShape)
-        )
-        Box(
-            modifier = Modifier
-                .size(250.dp)
-                .align(Alignment.BottomEnd)
-                .offset(x = 50.dp, y = 50.dp)
-                .blur(80.dp)
-                .background(SoftPurple.copy(alpha = 0.15f), CircleShape)
-        )
+        // Dynamic Cyber Background
+        if (isDark) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp)
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(CyberCyan.copy(alpha = 0.1f), Color.Transparent)
+                        )
+                    )
+            )
+        }
 
         Scaffold(
             containerColor = Color.Transparent,
             topBar = {
-                CenterAlignedTopAppBar(
+                TopAppBar(
                     title = {
                         Text(
                             text = if (noteId == null) "Add Note" else "Edit Note",
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                fontWeight = FontWeight.Bold,
-                                letterSpacing = 0.5.sp
+                            style = MaterialTheme.typography.labelLarge.copy(
+                                fontWeight = FontWeight.Black,
+                                letterSpacing = 2.sp
                             ),
-                            color = Color.White
+                            color = if (isDark) AuroraGreen else Slate900
                         )
                     },
                     navigationIcon = {
-                        IconButton(
-                            onClick = onBackClick,
-                            modifier = Modifier
-                                .padding(start = 8.dp)
-                                .clip(CircleShape)
-                                .background(GlassWhite)
-                        ) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
+                        IconButton(onClick = onBackClick) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                         }
                     },
                     actions = {
+                        val isEnabled = title.isNotBlank() && content.isNotBlank()
+                        
                         IconButton(
                             onClick = {
                                 if (noteId == null) {
@@ -102,21 +98,22 @@ fun AddEditNoteScreen(
                                 }
                                 onSaveClick()
                             },
-                            enabled = title.isNotBlank() && content.isNotBlank(),
+                            enabled = isEnabled,
                             modifier = Modifier
                                 .padding(end = 8.dp)
-                                .clip(CircleShape)
-                                .background(if (title.isNotBlank() && content.isNotBlank()) ElectricBlue.copy(alpha = 0.2f) else GlassWhite)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(if (isEnabled) AuroraGreen else (if (isDark) Color.White.copy(alpha = 0.05f) else Color.LightGray))
                         ) {
                             Icon(
                                 Icons.Default.Check,
                                 contentDescription = "Save",
-                                tint = if (title.isNotBlank() && content.isNotBlank()) ElectricBlue else Color.White.copy(alpha = 0.4f)
+                                tint = if (isEnabled) DeepSpace else (if (isDark) Color.White.copy(alpha = 0.2f) else Color.Gray)
                             )
                         }
                     },
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                        containerColor = Color.Transparent
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent,
+                        navigationIconContentColor = if (isDark) Color.White else Slate900
                     )
                 )
             }
@@ -126,46 +123,48 @@ fun AddEditNoteScreen(
                     .padding(padding)
                     .padding(24.dp)
                     .fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(20.dp)
+                verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
                 // Title Field
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text(
                         "Title",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = Color.White.copy(alpha = 0.7f),
-                        modifier = Modifier.padding(start = 4.dp)
+                        style = MaterialTheme.typography.labelSmall,
+                        color = AuroraGreen,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.sp
                     )
                     TextField(
                         value = title,
                         onValueChange = { title = it },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(20.dp))
-                            .background(GlassWhite)
-                            .border(1.dp, GlassBorder, RoundedCornerShape(20.dp)),
-                        placeholder = { Text("Give it a name...", color = Color.White.copy(alpha = 0.3f)) },
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(if (isDark) MidnightBlue else IceBlue)
+                            .border(1.dp, if (isDark) Color.White.copy(alpha = 0.05f) else Color.Transparent, RoundedCornerShape(12.dp)),
+                        placeholder = { Text("Enter title...", color = (if (isDark) Color.White else Slate900).copy(alpha = 0.3f)) },
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
                             unfocusedContainerColor = Color.Transparent,
                             disabledContainerColor = Color.Transparent,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
-                            cursorColor = ElectricBlue,
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White
+                            cursorColor = AuroraGreen,
+                            focusedTextColor = if (isDark) Color.White else Slate900,
+                            unfocusedTextColor = if (isDark) Color.White else Slate900
                         ),
                         singleLine = true
                     )
                 }
 
                 // Content Field
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.weight(1f)) {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.weight(1f)) {
                     Text(
                         "Content",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = Color.White.copy(alpha = 0.7f),
-                        modifier = Modifier.padding(start = 4.dp)
+                        style = MaterialTheme.typography.labelSmall,
+                        color = ElectricViolet,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.sp
                     )
                     TextField(
                         value = content,
@@ -173,19 +172,19 @@ fun AddEditNoteScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f)
-                            .clip(RoundedCornerShape(24.dp))
-                            .background(GlassWhite)
-                            .border(1.dp, GlassBorder, RoundedCornerShape(24.dp)),
-                        placeholder = { Text("Write your story...", color = Color.White.copy(alpha = 0.3f)) },
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(if (isDark) MidnightBlue else IceBlue)
+                            .border(1.dp, if (isDark) Color.White.copy(alpha = 0.05f) else Color.Transparent, RoundedCornerShape(12.dp)),
+                        placeholder = { Text("Type something...", color = (if (isDark) Color.White else Slate900).copy(alpha = 0.3f)) },
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
                             unfocusedContainerColor = Color.Transparent,
                             disabledContainerColor = Color.Transparent,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
-                            cursorColor = ElectricBlue,
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White
+                            cursorColor = ElectricViolet,
+                            focusedTextColor = if (isDark) Color.White else Slate900,
+                            unfocusedTextColor = if (isDark) Color.White else Slate900
                         )
                     )
                 }

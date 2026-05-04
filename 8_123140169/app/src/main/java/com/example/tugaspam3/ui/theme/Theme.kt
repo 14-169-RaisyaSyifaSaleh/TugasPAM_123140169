@@ -17,31 +17,33 @@ import androidx.core.view.WindowCompat
 val LocalIsDark = staticCompositionLocalOf { false }
 
 val DarkColorScheme = darkColorScheme(
-    primary = ElectricBlue,
-    secondary = SoftPurple,
-    tertiary = SoftPink,
-    background = DeepMidnight,
-    surface = DeepMidnight,
-    onPrimary = Color.White,
+    primary = AuroraGreen,
+    secondary = ElectricViolet,
+    tertiary = CyberCyan,
+    background = DeepSpace,
+    surface = MidnightBlue,
+    onPrimary = DeepSpace,
     onSecondary = Color.White,
     onTertiary = Color.White,
     onBackground = Color.White,
-    onSurface = Color.White
+    onSurface = Color.White,
+    surfaceVariant = MidnightBlue.copy(alpha = 0.5f),
+    onSurfaceVariant = CyberCyan
 )
 
 val LightColorScheme = lightColorScheme(
-    primary = ElectricBlue,
-    secondary = SoftPurple,
-    tertiary = SoftPink,
-    background = SoftWhite,
-    surface = PureWhite,
+    primary = ElectricViolet,
+    secondary = CyberCyan,
+    tertiary = AuroraGreen,
+    background = FrostWhite,
+    surface = Color.White,
     onPrimary = Color.White,
     onSecondary = Color.White,
     onTertiary = Color.White,
-    onBackground = SlateDark,
-    onSurface = SlateDark,
-    surfaceVariant = Color(0xFFF1F5F9),
-    onSurfaceVariant = SlateLight
+    onBackground = Slate900,
+    onSurface = Slate900,
+    surfaceVariant = IceBlue,
+    onSurfaceVariant = Slate700
 )
 
 @Composable

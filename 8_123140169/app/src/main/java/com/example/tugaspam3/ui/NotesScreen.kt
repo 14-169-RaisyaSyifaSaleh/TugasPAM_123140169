@@ -1,5 +1,9 @@
 package com.example.tugaspam3.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.*
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -9,17 +13,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -39,50 +40,130 @@ fun NotesScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
+    val isSyncing by viewModel.isSyncing.collectAsState()
+    val isOnline by viewModel.isOnline.collectAsState()
     val isDark = LocalIsDark.current
+
+    val infiniteTransition = rememberInfiniteTransition(label = "sync")
+    val rotation by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "rotation"
+    )
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        // Background Glows (Only for Dark Mode)
+        // CYBER GRID BACKGROUND
         if (isDark) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                repeat(30) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(1.dp)
+                            .background(AuroraGreen.copy(alpha = 0.02f))
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                }
+            }
+            
             Box(
                 modifier = Modifier
-                    .size(300.dp)
-                    .offset(x = (-100).dp, y = (-50).dp)
-                    .blur(100.dp)
-                    .background(ElectricBlue.copy(alpha = 0.15f), CircleShape)
-            )
-            Box(
-                modifier = Modifier
-                    .size(250.dp)
-                    .align(Alignment.BottomEnd)
-                    .offset(x = 50.dp, y = 50.dp)
-                    .blur(80.dp)
-                    .background(SoftPurple.copy(alpha = 0.15f), CircleShape)
+                    .size(400.dp)
+                    .offset(x = 200.dp, y = (-100).dp)
+                    .blur(120.dp)
+                    .background(ElectricViolet.copy(alpha = 0.08f), CircleShape)
             )
         }
 
         Column(modifier = Modifier.fillMaxSize()) {
-            Text(
-                text = "Notes App",
-                style = MaterialTheme.typography.headlineLarge.copy(
-                    fontWeight = FontWeight.ExtraBold,
-                    letterSpacing = (-1).sp
-                ),
-                modifier = Modifier.padding(start = 24.dp, top = 64.dp, end = 24.dp),
-                color = MaterialTheme.colorScheme.onBackground
-            )
+            // Network Status Indicator
+            AnimatedVisibility(
+                visible = !isOnline,
+                enter = expandVertically(),
+                exit = shrinkVertically()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.errorContainer)
+                        .padding(vertical = 4.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            Icons.Default.WifiOff,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onErrorContainer,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            "Offline Mode",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onErrorContainer,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+
+            // New Centered Header
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 32.dp, bottom = 16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "NOTES APP",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = AuroraGreen,
+                        fontWeight = FontWeight.Black,
+                        letterSpacing = 4.sp
+                    )
+                    Text(
+                        text = "My Notes",
+                        style = MaterialTheme.typography.headlineLarge.copy(
+                            fontWeight = FontWeight.Black,
+                            letterSpacing = 1.sp
+                        ),
+                        color = if (isDark) Color.White else Slate900
+                    )
+                }
+                
+                IconButton(
+                    onClick = { if (isOnline) viewModel.syncNotes() },
+                    enabled = isOnline,
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(end = 24.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(if (isDark) MidnightBlue else IceBlue)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = "Sync",
+                        tint = if (isOnline) AuroraGreen else Color.Gray,
+                        modifier = Modifier.rotate(if (isSyncing) rotation else 0f)
+                    )
+                }
+            }
 
             Box(modifier = Modifier.fillMaxWidth().zIndex(1f)) {
-                GlassSearchBar(
+                ModernSearchBar(
                     query = searchQuery,
                     onQueryChange = { viewModel.onSearchQueryChange(it) }
                 )
 
-                // Search Results Overlay
                 if (searchQuery.isNotEmpty()) {
                     val searchResults = (uiState as? NotesUiState.Success)?.notes ?: emptyList()
                     
@@ -91,21 +172,14 @@ fun NotesScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 24.dp)
-                                .offset(y = 88.dp),
-                            shape = RoundedCornerShape(24.dp),
-                            colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+                                .offset(y = 80.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .background(
-                                        if (isDark) DeepMidnight.copy(alpha = 0.95f) 
-                                        else Color.White.copy(alpha = 0.98f)
-                                    )
-                                    .border(
-                                        1.dp, 
-                                        if (isDark) GlassBorder else LightBorder, 
-                                        RoundedCornerShape(24.dp)
-                                    )
+                                    .background(MaterialTheme.colorScheme.surface)
+                                    .border(1.dp, AuroraGreen.copy(alpha = 0.2f), RoundedCornerShape(16.dp))
                                     .heightIn(max = 300.dp)
                             ) {
                                 LazyColumn(
@@ -129,19 +203,20 @@ fun NotesScreen(
                 }
             }
 
-            // Main Content
             if (searchQuery.isEmpty()) {
                 when (val state = uiState) {
                     is NotesUiState.Loading -> {
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator(color = ElectricBlue)
+                            CircularProgressIndicator(color = AuroraGreen)
                         }
                     }
                     is NotesUiState.Empty -> {
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             Text(
-                                "Your story begins here...", 
-                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                                "NO NOTES FOUND", 
+                                color = (if (isDark) Color.White else SlateDark).copy(alpha = 0.3f),
+                                fontWeight = FontWeight.Black,
+                                letterSpacing = 2.sp
                             )
                         }
                     }
@@ -152,7 +227,7 @@ fun NotesScreen(
                             verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
                             items(state.notes) { note ->
-                                GlassNoteItem(
+                                ModernNoteItem(
                                     note = note,
                                     isDark = isDark,
                                     onClick = { onNoteClick(note.id) },
@@ -176,47 +251,40 @@ fun SearchItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(12.dp))
             .clickable { onClick() }
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .background(ElectricBlue.copy(alpha = 0.1f)),
+                .size(36.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(AuroraGreen.copy(alpha = 0.1f)),
             contentAlignment = Alignment.Center
         ) {
-            Icon(
-                Icons.Default.Search, 
-                contentDescription = null, 
-                tint = ElectricBlue, 
-                modifier = Modifier.size(20.dp)
-            )
+            Icon(Icons.Default.Search, contentDescription = null, tint = AuroraGreen, modifier = Modifier.size(18.dp))
         }
         Spacer(modifier = Modifier.width(12.dp))
         Column {
             Text(
                 note.title, 
-                color = if (isDark) Color.White else SlateDark, 
+                color = if (isDark) Color.White else Slate900, 
                 fontWeight = FontWeight.Bold, 
                 maxLines = 1, 
                 overflow = TextOverflow.Ellipsis
             )
             Text(
-                note.content, 
-                color = if (isDark) Color.White.copy(alpha = 0.8f) else SlateLight, 
-                style = MaterialTheme.typography.bodySmall, 
-                maxLines = 1, 
-                overflow = TextOverflow.Ellipsis
+                "ID: ${note.id}", 
+                color = AuroraGreen, 
+                style = MaterialTheme.typography.labelSmall
             )
         }
     }
 }
 
 @Composable
-fun GlassSearchBar(
+fun ModernSearchBar(
     query: String,
     onQueryChange: (String) -> Unit
 ) {
@@ -226,21 +294,22 @@ fun GlassSearchBar(
         onValueChange = onQueryChange,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(24.dp)
-            .clip(RoundedCornerShape(24.dp))
-            .background(if (isDark) GlassWhite else GlassBlack.copy(alpha = 0.05f))
-            .border(1.dp, if (isDark) GlassBorder else LightBorder, RoundedCornerShape(24.dp)),
+            .padding(horizontal = 24.dp, vertical = 8.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(if (isDark) MidnightBlue else IceBlue)
+            .border(1.dp, if (isDark) AuroraGreen.copy(alpha = 0.2f) else Color.Transparent, RoundedCornerShape(8.dp)),
         placeholder = { 
             Text(
-                "Search your thoughts...", 
-                color = (if (isDark) Color.White else SlateDark).copy(alpha = 0.6f)
+                "Search notes...",
+                color = (if (isDark) Color.White else SlateDark).copy(alpha = 0.3f),
+                fontWeight = FontWeight.Bold
             ) 
         },
         leadingIcon = { 
             Icon(
                 Icons.Default.Search, 
                 contentDescription = null, 
-                tint = if (isDark) Color.White else SlateDark 
+                tint = if (isDark) AuroraGreen else Slate500 
             ) 
         },
         colors = TextFieldDefaults.colors(
@@ -249,17 +318,16 @@ fun GlassSearchBar(
             disabledContainerColor = Color.Transparent,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
-            disabledIndicatorColor = Color.Transparent,
-            cursorColor = if (isDark) Color.White else ElectricBlue,
-            focusedTextColor = if (isDark) Color.White else SlateDark,
-            unfocusedTextColor = if (isDark) Color.White else SlateDark
+            cursorColor = AuroraGreen,
+            focusedTextColor = if (isDark) Color.White else Slate900,
+            unfocusedTextColor = if (isDark) Color.White else Slate900
         ),
         singleLine = true
     )
 }
 
 @Composable
-fun GlassNoteItem(
+fun ModernNoteItem(
     note: Note,
     isDark: Boolean,
     onClick: () -> Unit,
@@ -268,31 +336,31 @@ fun GlassNoteItem(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(28.dp))
-            .background(if (isDark) GlassWhite else GlassBlack.copy(alpha = 0.05f))
-            .border(1.dp, if (isDark) GlassBorder else LightBorder, RoundedCornerShape(28.dp))
+            .clip(RoundedCornerShape(12.dp))
+            .background(if (isDark) MidnightBlue else Color.White)
+            .border(
+                1.dp, 
+                if (isDark) Color.White.copy(alpha = 0.05f) else IceBlue, 
+                RoundedCornerShape(12.dp)
+            )
             .clickable { onClick() }
     ) {
         Row(
-            modifier = Modifier.padding(20.dp),
+            modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
-                    .size(56.dp)
-                    .clip(CircleShape)
-                    .background(
-                        Brush.linearGradient(
-                            listOf(ElectricBlue.copy(alpha = 0.8f), SoftPurple.copy(alpha = 0.8f))
-                        )
-                    ),
+                    .size(44.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(if (isDark) DeepSpace else IceBlue),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = note.title.take(1).uppercase(),
-                    style = MaterialTheme.typography.titleLarge,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold
+                    style = MaterialTheme.typography.titleMedium,
+                    color = AuroraGreen,
+                    fontWeight = FontWeight.Black
                 )
             }
 
@@ -302,36 +370,26 @@ fun GlassNoteItem(
                 Text(
                     text = note.title,
                     style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 0.5.sp
+                        fontWeight = FontWeight.Bold
                     ),
-                    color = if (isDark) Color.White else SlateDark,
+                    color = if (isDark) Color.White else Slate900,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = note.content,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = if (isDark) Color.White.copy(alpha = 0.8f) else SlateLight,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (isDark) Color.White.copy(alpha = 0.5f) else Slate500,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
             }
 
-            IconButton(
-                onClick = onFavoriteToggle,
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .background(
-                        if (note.isFavorite) ElectricBlue.copy(alpha = 0.1f)
-                        else Color.Transparent
-                    )
-            ) {
+            IconButton(onClick = onFavoriteToggle) {
                 Icon(
                     imageVector = if (note.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                     contentDescription = "Favorite",
-                    tint = if (note.isFavorite) (if (isDark) SoftPink else ElectricBlue) else (if (isDark) Color.White.copy(alpha = 0.6f) else SlateLight.copy(alpha = 0.6f))
+                    tint = if (note.isFavorite) NeonPink else (if (isDark) Color.White.copy(alpha = 0.1f) else Color.Black.copy(alpha = 0.1f))
                 )
             }
         }

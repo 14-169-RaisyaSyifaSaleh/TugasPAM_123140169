@@ -71,6 +71,11 @@ dependencies {
     // Koin
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
+    implementation(libs.koin.core)
+
+    // Retrofit untuk Bonus Sync API
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.gson)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

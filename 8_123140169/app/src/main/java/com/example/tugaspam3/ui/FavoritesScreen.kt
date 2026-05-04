@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -34,33 +35,50 @@ fun FavoritesScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        // Background Glow
+        // Modern Aurora Background
         if (isDark) {
             Box(
                 modifier = Modifier
-                    .size(300.dp)
-                    .align(Alignment.TopEnd)
-                    .offset(x = 100.dp, y = (-50).dp)
-                    .blur(100.dp)
-                    .background(SoftPink.copy(alpha = 0.1f), CircleShape)
+                    .fillMaxSize()
+                    .background(
+                        Brush.radialGradient(
+                            colors = listOf(NeonPink.copy(alpha = 0.05f), Color.Transparent),
+                            center = androidx.compose.ui.geometry.Offset(0f, 0f),
+                            radius = 1000f
+                        )
+                    )
             )
         }
 
         Column(modifier = Modifier.fillMaxSize()) {
-            Text(
-                text = "Favorites",
-                style = MaterialTheme.typography.headlineLarge.copy(
-                    fontWeight = FontWeight.ExtraBold,
-                    letterSpacing = (-1).sp
-                ),
-                modifier = Modifier.padding(start = 24.dp, top = 64.dp, end = 24.dp, bottom = 24.dp),
-                color = MaterialTheme.colorScheme.onBackground
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 64.dp, bottom = 24.dp, start = 24.dp, end = 24.dp)
+            ) {
+                Column {
+                    Text(
+                        text = "FAVORITES",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = NeonPink,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 2.sp
+                    )
+                    Text(
+                        text = "Pinned Notes",
+                        style = MaterialTheme.typography.headlineLarge.copy(
+                            fontWeight = FontWeight.Black,
+                            letterSpacing = 1.sp
+                        ),
+                        color = if (isDark) Color.White else Slate900
+                    )
+                }
+            }
 
             when (val state = uiState) {
                 is NotesUiState.Loading -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = SoftPink)
+                        CircularProgressIndicator(color = NeonPink)
                     }
                 }
                 is NotesUiState.Empty, is NotesUiState.Success -> {
@@ -70,8 +88,9 @@ fun FavoritesScreen(
                     if (favoriteNotes.isEmpty()) {
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             Text(
-                                "No favorites yet. Tap the heart!",
-                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                                "NO FAVORITE NOTES",
+                                color = (if (isDark) Color.White else SlateDark).copy(alpha = 0.3f),
+                                fontWeight = FontWeight.Black
                             )
                         }
                     } else {
@@ -81,7 +100,7 @@ fun FavoritesScreen(
                             verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
                             items(favoriteNotes) { note ->
-                                GlassNoteItem(
+                                ModernNoteItem(
                                     note = note,
                                     isDark = isDark,
                                     onClick = { onNoteClick(note.id) },

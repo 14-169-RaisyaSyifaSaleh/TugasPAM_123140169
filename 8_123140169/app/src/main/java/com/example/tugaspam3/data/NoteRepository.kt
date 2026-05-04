@@ -7,8 +7,12 @@ import com.example.tugaspam3.model.Note
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 
-class NoteRepository(database: NoteDatabase) {
+class NoteRepository(
+    database: NoteDatabase,
+    private val apiService: ApiService
+) {
     private val queries = database.noteEntityQueries
 
     fun getAllNotes(): Flow<List<Note>> {
@@ -45,6 +49,27 @@ class NoteRepository(database: NoteDatabase) {
 
     suspend fun toggleFavorite(id: Long, isFavorite: Boolean) {
         queries.updateFavorite(isFavorite, id)
+    }
+
+    suspend fun syncWithRemote() = withContext(Dispatchers.IO) {
+        try {
+            val remoteNotes = apiService.getRemoteNotes()
+            remoteNotes.forEach { remote ->
+                // Periksa apakah sudah ada (berdasarkan judul sebagai contoh sederhana jika ID bentrok)
+                // Atau insert saja sebagai catatan baru
+                queries.insertNote(
+                    id = null, // Biarkan autoincrement
+                    title = "[Sync] ${remote.title}",
+                    content = remote.body,
+                    timestamp = System.currentTimeMillis(),
+                    isFavorite = false
+                )
+            }
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
     }
 
     private fun com.example.tugaspam3.db.NoteEntity.toNote(): Note {

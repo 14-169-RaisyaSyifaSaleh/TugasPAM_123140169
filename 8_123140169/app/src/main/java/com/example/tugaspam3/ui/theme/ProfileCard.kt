@@ -1,9 +1,8 @@
-package com.example.tugaspam3.ui
+package com.example.tugaspam3.ui.theme
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -15,11 +14,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tugaspam3.model.ProfileUiState
-import com.example.tugaspam3.ui.theme.*
 
 @Composable
 fun ProfileCard(state: ProfileUiState) {
@@ -29,82 +26,113 @@ fun ProfileCard(state: ProfileUiState) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.Start
     ) {
-        // Name and NIM Section
-        Text(
-            text = state.name,
-            style = MaterialTheme.typography.headlineMedium.copy(
-                fontWeight = FontWeight.ExtraBold,
-                letterSpacing = (-0.5).sp
-            ),
-            color = if (isDark) Color.White else SlateDark,
-            textAlign = TextAlign.Center
-        )
-        
-        Text(
-            text = state.nim,
-            style = MaterialTheme.typography.titleMedium,
-            color = ElectricBlue,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(top = 4.dp)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Bio Section (Glassy Badge)
-        Surface(
-            modifier = Modifier
-                .clip(RoundedCornerShape(16.dp))
-                .background(if (isDark) GlassWhite else GlassBlack.copy(alpha = 0.05f))
-                .border(1.dp, if (isDark) GlassBorder else LightBorder, RoundedCornerShape(16.dp)),
-            color = Color.Transparent
+        // Asymmetric Name/NIM Header
+        Row(
+            verticalAlignment = Alignment.Bottom,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text(
-                text = state.bio,
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
-                style = MaterialTheme.typography.bodyMedium,
-                color = if (isDark) Color.White.copy(alpha = 0.8f) else SlateLight,
-                textAlign = TextAlign.Center
+            Box(
+                modifier = Modifier
+                    .width(8.dp)
+                    .height(80.dp)
+                    .background(Brush.verticalGradient(listOf(AuroraGreen, CyberCyan)))
             )
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
-        
-        // Info Section (Glassy Container)
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(32.dp))
-                .background(if (isDark) GlassWhite else GlassBlack.copy(alpha = 0.03f))
-                .border(1.dp, if (isDark) GlassBorder else LightBorder, RoundedCornerShape(32.dp))
-        ) {
-            Column(
-                modifier = Modifier.padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(20.dp)
-            ) {
-                InfoItem(
-                    icon = Icons.Default.Email,
-                    title = "Email Address",
-                    value = state.email,
-                    iconColor = ElectricBlue,
-                    isDark = isDark
+            
+            Spacer(modifier = Modifier.width(16.dp))
+            
+            Column {
+                Text(
+                    text = "PROFILE",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = AuroraGreen,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 2.sp
                 )
-                InfoItem(
-                    icon = Icons.Default.Phone,
-                    title = "Phone Number",
-                    value = state.phone,
-                    iconColor = SoftPurple,
-                    isDark = isDark
+                Text(
+                    text = state.name,
+                    style = MaterialTheme.typography.headlineMedium.copy(
+                        fontWeight = FontWeight.Black,
+                        letterSpacing = 1.sp
+                    ),
+                    color = if (isDark) Color.White else Slate900
                 )
-                InfoItem(
-                    icon = Icons.Default.LocationOn,
-                    title = "Current Location",
-                    value = state.location,
-                    iconColor = SoftPink,
-                    isDark = isDark
+                Text(
+                    text = "NIM: ${state.nim}",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = CyberCyan,
+                    fontWeight = FontWeight.Medium
                 )
             }
         }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // Bio Section
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(topEnd = 24.dp, bottomStart = 24.dp))
+                .background(if (isDark) MidnightBlue else IceBlue)
+                .border(
+                    width = 1.dp,
+                    color = if (isDark) Color.White.copy(alpha = 0.1f) else Color.Transparent,
+                    shape = RoundedCornerShape(topEnd = 24.dp, bottomStart = 24.dp)
+                )
+                .padding(20.dp)
+        ) {
+            Column {
+                Text(
+                    text = "ABOUT ME",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = ElectricViolet,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                Text(
+                    text = state.bio,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = if (isDark) Color.White.copy(alpha = 0.8f) else Slate700,
+                    lineHeight = 22.sp
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(40.dp))
+        
+        // Contact Info
+        Text(
+            "CONTACT INFORMATION",
+            style = MaterialTheme.typography.labelLarge,
+            color = if (isDark) AuroraGreen else Slate500,
+            fontWeight = FontWeight.Black,
+            letterSpacing = 1.sp
+        )
+        
+        Spacer(modifier = Modifier.height(16.dp))
+
+        InfoItem(
+            icon = Icons.Default.Email,
+            title = "Email Address",
+            value = state.email,
+            iconColor = CyberCyan,
+            isDark = isDark
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        InfoItem(
+            icon = Icons.Default.Phone,
+            title = "Phone Number",
+            value = state.phone,
+            iconColor = ElectricViolet,
+            isDark = isDark
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        InfoItem(
+            icon = Icons.Default.LocationOn,
+            title = "Location",
+            value = state.location,
+            iconColor = NeonPink,
+            isDark = isDark
+        )
     }
 }

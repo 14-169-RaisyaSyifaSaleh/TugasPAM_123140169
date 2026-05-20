@@ -1,28 +1,59 @@
-# Tugas PAM - Integrasi AI (Tugas 9)
+# Tugas Praktikum - Integrasi AI ke Aplikasi
 
-**Nama:** Raisya Syifa Saleh
-**NIM:** 123140169
-**Kelas:** Pengembangan Aplikasi Mobile RB
+## Identitas Mahasiswa
 
-## Fitur AI: Smart Note Assistant
-Aplikasi ini sekarang terintegrasi dengan **Gemini AI** untuk membantu pengguna mengelola catatan mereka secara lebih cerdas.
+Nama: Raisya Syifa Saleh  
+NIM: 123140169  
+Kelas: Pengembangan Aplikasi Mobile RB  
 
-### Fitur Utama AI:
-1.  **Smart Chatbot/Assistant**: Pengguna dapat berdiskusi dengan AI mengenai isi catatan tertentu.
-2.  **Content Summarization**: AI dapat merangkum isi catatan yang panjang menjadi poin-poin penting.
-3.  **Multi-turn Conversation**: Percakapan berkelanjutan yang mengingat konteks catatan (Fitur Bonus).
-4.  **Streaming Response**: Jawaban AI ditampilkan secara real-time saat sedang dibuat (Fitur Bonus).
+## Deskripsi Tugas
 
-### Detail Implementasi:
-*   **Gemini API**: Menggunakan SDK `generativeai` versi 0.9.0.
-*   **Prompt Engineering**: Menggunakan *System Instruction* yang dirancang khusus agar AI bertindak sebagai asisten catatan yang profesional dan ringkas.
-*   **Error Handling**: Implementasi status UI (Idle, Loading, Success, Error) untuk menangani kegagalan API atau masalah jaringan secara anggun.
-*   **UI/UX**: Dialog chat yang responsif dengan *loading indicators* dan bubble chat yang intuitif.
+Repository ini dibuat untuk memenuhi tugas praktikum mata kuliah Pengembangan Aplikasi Mobile.
 
-### Cara Penggunaan:
-1.  Buka salah satu catatan yang ada di daftar.
-2.  Klik ikon **AI (Sparkles/AutoAwesome)** di Top Bar.
-3.  Ketik pertanyaan atau minta rangkuman di kolom chat yang muncul.
+Pada tugas ini, saya mengintegrasikan minimal satu fitur AI ke dalam aplikasi. Fitur AI digunakan untuk membantu pengguna dalam menghasilkan respons berdasarkan input yang diberikan.
 
----
-*Catatan: API Key Gemini perlu dikonfigurasi di `AppModule.kt` agar fitur ini dapat berjalan.*
+## Fitur AI yang Diimplementasikan
+
+Fitur AI yang digunakan pada aplikasi ini adalah:
+
+- Smart chatbot / assistant
+- Content summarization
+- Translation feature
+- Analisis input dari pengguna
+
+## Fitur Aplikasi
+
+1. Menggunakan Gemini API atau OpenAI API.
+2. Mengirim prompt dari aplikasi ke layanan AI.
+3. Menampilkan hasil respons AI ke dalam aplikasi.
+4. Menerapkan proper error handling.
+5. Menampilkan loading state saat proses request berjalan.
+6. UI dibuat responsif dan mudah digunakan.
+7. Dokumentasi fitur AI ditulis pada README.
+
+## Teknologi yang Digunakan
+
+- Kotlin
+- Jetpack Compose
+- Gemini API / OpenAI API
+- Coroutines
+- ViewModel
+- Android Studio
+
+## Cara Menjalankan Aplikasi
+
+1. Clone repository berikut:
+
+   ```bash
+   git clone https://github.com/14-169-RaisyaSyifaSaleh/TugasPAM_123140169.git
+   ```
+2. Buka project menggunakan Android Studio.
+3. Tambahkan API key pada file konfigurasi yang digunakan, misalnya local.properties.
+```bash
+GEMINI_API_KEY=isi_api_key_kamu
+```
+4. Tunggu proses Gradle Sync selesai.
+5. Jalankan aplikasi pada emulator atau perangkat Android.
+
+## Screenshot Aplikasi
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/5bc8e4f8-0f41-4ffc-974b-c24175e3bdba" />

@@ -1,7 +1,9 @@
 package com.example.a6_123140169.data.model
 
+import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -11,6 +13,7 @@ data class NewsResponse(
 )
 
 @Serializable
+@Parcelize
 @Entity(tableName = "articles")
 data class Article(
     @PrimaryKey
@@ -22,4 +25,4 @@ data class Article(
     @SerialName("published_at")
     val publishedAt: String,
     val url: String
-)
+) : Parcelable

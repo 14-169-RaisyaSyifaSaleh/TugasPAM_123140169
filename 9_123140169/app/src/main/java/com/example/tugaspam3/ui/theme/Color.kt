@@ -2,30 +2,35 @@ package com.example.tugaspam3.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Dark Mode Colors (Glassmorphism)
-val GlassWhite = Color(0x33FFFFFF)
-val GlassBorder = Color(0x66FFFFFF)
-val DeepMidnight = Color(0xFF0F172A)
-val ElectricBlue = Color(0xFF3B82F6)
-val SoftPurple = Color(0xFF8B5CF6)
-val SoftPink = Color(0xFFEC4899)
-val BoldRed = Color(0xFFB91C1C) 
-val Gunmetal = Color(0xFF2D3748) 
+// Modern Midnight Aurora Palette
+val DeepSpace = Color(0xFF0B0E14)
+val MidnightBlue = Color(0xFF151921)
+val AuroraGreen = Color(0xFF00FFC2)
+val ElectricViolet = Color(0xFF8B5CF6)
+val CyberCyan = Color(0xFF06B6D4)
+val NeonPink = Color(0xFFF472B6)
 
-// Light Mode Colors (Clean & Soft)
-val SoftWhite = Color(0xFFF8FAFC)
+// Light Mode "Frost" Palette
+val FrostWhite = Color(0xFFF8FAFC)
+val IceBlue = Color(0xFFE2E8F0)
+val Slate900 = Color(0xFF0F172A)
+val Slate700 = Color(0xFF334155)
+val Slate500 = Color(0xFF64748B)
+
+// Functional Mappings for existing code
+val SoftPink = NeonPink
+val Lavender = ElectricViolet
+val SakuraPink = AuroraGreen
+val CoralSoft = CyberCyan
+val GlassWhite = Color(0x1AFFFFFF)
+val GlassBorder = Color(0x33FFFFFF)
+val DeepMidnight = DeepSpace
+val SlateDark = Slate900
+val SlateLight = Slate500
+val SoftWhite = FrostWhite
 val PureWhite = Color(0xFFFFFFFF)
-val SlateDark = Color(0xFF1E293B)
-val SlateLight = Color(0xFF64748B)
-val SoftBlue = Color(0xFF60A5FA)
-val SoftIndigo = Color(0xFF818CF8)
-val GlassBlack = Color(0x0D000000)
+val GlassBlack = Color(0x1A000000)
 val LightBorder = Color(0x1A000000)
-
-val Blue80 = Color(0xFFAECBFA)
-val BlueGrey80 = Color(0xFFC2C7CF)
-val Cyan80 = Color(0xFFA2F1FC)
-
-val Blue40 = Color(0xFF1967D2)
-val BlueGrey40 = Color(0xFF5E6368)
-val Cyan40 = Color(0xFF007B83)
+val PrimaryGradient = listOf(ElectricViolet, CyberCyan)
+val ElectricBlue = CyberCyan
+val SoftPurple = ElectricViolet

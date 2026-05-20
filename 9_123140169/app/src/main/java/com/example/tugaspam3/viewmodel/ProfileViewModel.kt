@@ -11,12 +11,13 @@ class ProfileViewModel : ViewModel() {
 
     private val _uiState = MutableStateFlow(
         ProfileUiState(
-            name = "Raditya Alrasyid Nugroho",
-            nim = "123140125",
+            name = "Raisya Syifa Saleh",
+            nim = "123140169",
             bio = "Mahasiswa Teknik Informatika ITERA",
-            email = "raditya@student.itera.ac.id",
+            email = "raisya.123140169@student.itera.ac.id",
             phone = "+628123456789",
-            location = "Lampung"
+            location = "Lampung",
+            profileImageUri = null // This will be handled by UI to show a placeholder or updated image
         )
     )
 

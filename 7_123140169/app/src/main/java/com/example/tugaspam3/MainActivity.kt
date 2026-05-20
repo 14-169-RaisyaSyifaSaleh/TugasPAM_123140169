@@ -3,6 +3,9 @@ package com.example.tugaspam3
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -21,7 +24,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -37,6 +43,7 @@ import com.example.tugaspam3.data.SettingsManager
 import com.example.tugaspam3.db.NoteDatabase
 import com.example.tugaspam3.ui.*
 import com.example.tugaspam3.ui.theme.*
+import com.example.tugaspam3.util.NetworkObserver
 import com.example.tugaspam3.viewmodel.NotesViewModel
 import com.example.tugaspam3.viewmodel.ProfileViewModel
 import com.example.tugaspam3.viewmodel.SettingsViewModel
@@ -75,7 +82,7 @@ class MainActivity : ComponentActivity() {
                 factory = object : ViewModelProvider.Factory {
                     override fun <T : ViewModel> create(modelClass: Class<T>): T {
                         @Suppress("UNCHECKED_CAST")
-                        return NotesViewModel(repository) as T
+                        return NotesViewModel(repository, settingsManager) as T
                     }
                 }
             )
@@ -95,6 +102,10 @@ fun MainApp(
     notesViewModel: NotesViewModel,
     settingsViewModel: SettingsViewModel
 ) {
+    val context = LocalContext.current
+    val networkObserver = remember { NetworkObserver(context) }
+    val networkStatus by networkObserver.observe.collectAsState(initial = NetworkObserver.Status.Available)
+    
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -106,6 +117,29 @@ fun MainApp(
     Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         Scaffold(
             containerColor = Color.Transparent,
+            topBar = {
+                AnimatedVisibility(
+                    visible = networkStatus != NetworkObserver.Status.Available,
+                    enter = expandVertically(),
+                    exit = shrinkVertically()
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.Red.copy(alpha = 0.8f))
+                            .padding(vertical = 4.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "OFFLINE MODE",
+                            color = Color.White,
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 1.sp
+                        )
+                    }
+                }
+            },
             bottomBar = {
                 if (showBottomBar) {
                     Box(
@@ -185,7 +219,7 @@ fun MainApp(
                         containerColor = Color.Transparent,
                         elevation = FloatingActionButtonDefaults.elevation(0.dp),
                         modifier = Modifier
-                            .padding(bottom = 90.dp)
+                            .offset(y = (-40).dp)
                             .size(64.dp)
                             .clip(CircleShape)
                             .background(
@@ -206,6 +240,7 @@ fun MainApp(
                 composable(Screen.Notes.route) {
                     NotesScreen(
                         viewModel = notesViewModel,
+                        isOffline = networkStatus != NetworkObserver.Status.Available,
                         onNoteClick = { noteId ->
                             navController.navigate(Screen.NoteDetail.createRoute(noteId))
                         }

@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -12,13 +11,12 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -26,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.tugaspam3.ui.theme.*
-import com.example.tugaspam3.viewmodel.AiUiState
+import com.example.tugaspam3.viewmodel.AiViewModel
 import com.example.tugaspam3.viewmodel.NotesViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,54 +32,43 @@ import com.example.tugaspam3.viewmodel.NotesViewModel
 fun NoteDetailScreen(
     noteId: Long,
     viewModel: NotesViewModel,
+    aiViewModel: AiViewModel,
     onBackClick: () -> Unit,
     onEditClick: (Long) -> Unit,
     onDeleteClick: () -> Unit
 ) {
     val note by viewModel.getNoteById(noteId).collectAsState(initial = null)
-    val aiState by viewModel.aiState.collectAsState()
     var showDeleteDialog by remember { mutableStateOf(false) }
-    var showAiDialog by remember { mutableStateOf(false) }
-    var userQuestion by remember { mutableStateOf("") }
+    var showAiChat by remember { mutableStateOf(false) }
+    val isDark = LocalIsDark.current
 
     if (showDeleteDialog) {
         Dialog(onDismissRequest = { showDeleteDialog = false }) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(32.dp))
-                    .background(DeepMidnight.copy(alpha = 0.95f))
-                    .border(1.dp, GlassBorder, RoundedCornerShape(32.dp))
+                    .clip(RoundedCornerShape(24.dp))
+                    .background(if (isDark) DeepSpace else Color.White)
+                    .border(1.dp, AuroraGreen.copy(alpha = 0.3f), RoundedCornerShape(24.dp))
                     .padding(24.dp)
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(64.dp)
-                            .clip(CircleShape)
-                            .background(BoldRed.copy(alpha = 0.15f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(Icons.Default.Delete, contentDescription = null, tint = BoldRed, modifier = Modifier.size(32.dp))
-                    }
-
                     Text(
-                        "Hapus Catatan?",
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Color.White
-                        )
+                        "DELETE NOTE",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = NeonPink,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 2.sp
                     )
 
                     Text(
-                        "Apakah Anda yakin ingin menghapus catatan ini? Tindakan ini tidak dapat dibatalkan.",
+                        "Are you sure you want to delete this note? This action cannot be undone.",
                         style = MaterialTheme.typography.bodyMedium.copy(
-                            color = Color.White.copy(alpha = 0.8f),
-                            textAlign = TextAlign.Center,
-                            lineHeight = 22.sp
+                            color = (if (isDark) Color.White else Slate900).copy(alpha = 0.7f),
+                            textAlign = TextAlign.Center
                         )
                     )
 
@@ -89,13 +76,11 @@ fun NoteDetailScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Button(
+                        TextButton(
                             onClick = { showDeleteDialog = false },
-                            modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.buttonColors(containerColor = Gunmetal),
-                            shape = RoundedCornerShape(16.dp)
+                            modifier = Modifier.weight(1f)
                         ) {
-                            Text("Batal", color = Color.White)
+                            Text("CANCEL", color = if (isDark) Color.White else Slate900)
                         }
                         Button(
                             onClick = {
@@ -104,10 +89,10 @@ fun NoteDetailScreen(
                                 onDeleteClick()
                             },
                             modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.buttonColors(containerColor = BoldRed),
-                            shape = RoundedCornerShape(16.dp)
+                            colors = ButtonDefaults.buttonColors(containerColor = NeonPink),
+                            shape = RoundedCornerShape(12.dp)
                         ) {
-                            Text("Hapus", color = Color.White, fontWeight = FontWeight.Bold)
+                            Text("DELETE", fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -115,246 +100,122 @@ fun NoteDetailScreen(
         }
     }
 
-    if (showAiDialog) {
-        AlertDialog(
-            onDismissRequest = { 
-                showAiDialog = false
-                viewModel.resetAiState()
-                userQuestion = ""
-            },
-            title = {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = ElectricBlue)
-                    Spacer(Modifier.width(8.dp))
-                    Text("Asisten Catatan AI", fontWeight = FontWeight.Bold)
-                }
-            },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    // Response Area
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(min = 100.dp, max = 250.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(Color.White.copy(alpha = 0.05f))
-                            .padding(12.dp)
-                            .verticalScroll(rememberScrollState())
-                    ) {
-                        when (val state = aiState) {
-                            is AiUiState.Loading -> {
-                                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                    CircularProgressIndicator(color = ElectricBlue)
-                                }
-                            }
-                            is AiUiState.Streaming -> {
-                                Text(state.partialResponse, color = Color.White.copy(alpha = 0.9f))
-                            }
-                            is AiUiState.Success -> {
-                                Text(state.response, color = Color.White.copy(alpha = 0.9f))
-                            }
-                            is AiUiState.Error -> {
-                                Text(state.message, color = BoldRed)
-                            }
-                            is AiUiState.Idle -> {
-                                Text("Tanyakan sesuatu tentang catatan ini atau minta ringkasan.", color = Color.White.copy(alpha = 0.5f))
-                            }
-                        }
-                    }
-
-                    // Quick Actions
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        ElevatedButton(
-                            onClick = { note?.let { viewModel.summarizeNote(it.content) } },
-                            colors = ButtonDefaults.elevatedButtonColors(containerColor = GlassWhite)
-                        ) {
-                            Text("Ringkas", color = ElectricBlue)
-                        }
-                    }
-
-                    // Chat Input
-                    OutlinedTextField(
-                        value = userQuestion,
-                        onValueChange = { userQuestion = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        placeholder = { 
-                            Text(
-                                "Tanya AI...", 
-                                color = Color.Gray,
-                                fontSize = 14.sp
-                            ) 
-                        },
-                        textStyle = LocalTextStyle.current.copy(
-                            color = Color.White,
-                            fontSize = 14.sp,
-                            lineHeight = 20.sp
-                        ),
-                        singleLine = true,
-                        trailingIcon = {
-                            IconButton(onClick = { 
-                                if (userQuestion.isNotBlank()) {
-                                    note?.let { viewModel.askAi(it.content, userQuestion) }
-                                }
-                            }) {
-                                Icon(Icons.Default.Send, contentDescription = null, tint = ElectricBlue)
-                            }
-                        },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White,
-                            focusedBorderColor = ElectricBlue,
-                            unfocusedBorderColor = GlassBorder,
-                            cursorColor = ElectricBlue
-                        ),
-                        shape = RoundedCornerShape(16.dp)
-                    )
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = { 
-                    showAiDialog = false
-                    viewModel.resetAiState()
-                    userQuestion = ""
-                }) {
-                    Text("Tutup", color = ElectricBlue)
-                }
-            },
-            containerColor = DeepMidnight,
-            titleContentColor = Color.White,
-            textContentColor = Color.White,
-            shape = RoundedCornerShape(24.dp)
+    if (showAiChat && note != null) {
+        AiChatDialog(
+            noteTitle = note?.title ?: "",
+            noteContent = note?.content ?: "",
+            viewModel = aiViewModel,
+            onDismiss = { 
+                showAiChat = false 
+                aiViewModel.clearState()
+            }
         )
     }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(DeepMidnight)
+            .background(MaterialTheme.colorScheme.background)
     ) {
-        // Background Glows
-        Box(
-            modifier = Modifier
-                .size(400.dp)
-                .align(Alignment.Center)
-                .blur(120.dp)
-                .background(SoftPurple.copy(alpha = 0.1f), CircleShape)
-        )
+        if (isDark) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(Color.Transparent, MidnightBlue)
+                        )
+                    )
+            )
+        }
 
         Scaffold(
             containerColor = Color.Transparent,
             topBar = {
-                CenterAlignedTopAppBar(
+                TopAppBar(
                     title = {
                         Text(
-                            "Detail",
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                fontWeight = FontWeight.Bold,
-                                letterSpacing = 1.sp
+                            "NOTE DETAILS",
+                            style = MaterialTheme.typography.labelLarge.copy(
+                                fontWeight = FontWeight.Black,
+                                letterSpacing = 2.sp
                             )
                         )
                     },
                     navigationIcon = {
-                        IconButton(
-                            onClick = onBackClick,
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .clip(CircleShape)
-                                .background(GlassWhite)
-                        ) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
+                        IconButton(onClick = onBackClick) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                         }
                     },
                     actions = {
-                        IconButton(
-                            onClick = { showAiDialog = true },
-                            modifier = Modifier
-                                .padding(horizontal = 4.dp)
-                                .clip(CircleShape)
-                                .background(GlassWhite)
-                        ) {
-                            Icon(Icons.Default.AutoAwesome, contentDescription = "AI Assistant", tint = ElectricBlue)
+                        IconButton(onClick = { showAiChat = true }) {
+                            Icon(Icons.Default.AutoAwesome, contentDescription = "AI Assistant", tint = CyberCyan)
                         }
-                        IconButton(
-                            onClick = { onEditClick(noteId) },
-                            modifier = Modifier
-                                .padding(horizontal = 4.dp)
-                                .clip(CircleShape)
-                                .background(GlassWhite)
-                        ) {
-                            Icon(Icons.Default.Edit, contentDescription = "Edit", tint = ElectricBlue)
+                        IconButton(onClick = { onEditClick(noteId) }) {
+                            Icon(Icons.Default.Edit, contentDescription = "Edit", tint = AuroraGreen)
                         }
-                        IconButton(
-                            onClick = { showDeleteDialog = true },
-                            modifier = Modifier
-                                .padding(end = 8.dp)
-                                .clip(CircleShape)
-                                .background(GlassWhite)
-                        ) {
-                            Icon(Icons.Default.Delete, contentDescription = "Delete", tint = BoldRed)
+                        IconButton(onClick = { showDeleteDialog = true }) {
+                            Icon(Icons.Default.Delete, contentDescription = "Delete", tint = NeonPink)
                         }
                     },
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                        containerColor = Color.Transparent
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent,
+                        titleContentColor = if (isDark) CyberCyan else Slate900,
+                        navigationIconContentColor = if (isDark) Color.White else Slate900
                     )
                 )
             }
         ) { padding ->
-            note?.let { currentNote ->
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(padding)
-                        .padding(horizontal = 24.dp)
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    Spacer(modifier = Modifier.height(24.dp))
+            Column(
+                modifier = Modifier
+                    .padding(padding)
+                    .padding(24.dp)
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+            ) {
+                if (note != null) {
+                    // Header Accent
+                    Box(
+                        modifier = Modifier
+                            .width(60.dp)
+                            .height(4.dp)
+                            .background(AuroraGreen)
+                    )
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = currentNote.title,
-                        style = MaterialTheme.typography.headlineMedium.copy(
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Color.White,
-                            lineHeight = 36.sp
+                        text = note?.title ?: "",
+                        style = MaterialTheme.typography.headlineLarge.copy(
+                            fontWeight = FontWeight.Black,
+                            color = if (isDark) Color.White else Slate900
                         )
                     )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Surface(
-                            color = SoftPurple.copy(alpha = 0.2f),
-                            shape = RoundedCornerShape(8.dp)
-                        ) {
-                            Text(
-                                text = "Note",
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = SoftPurple
-                            )
-                        }
-                    }
-
+                    
                     Spacer(modifier = Modifier.height(32.dp))
 
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(24.dp))
-                            .background(GlassWhite)
-                            .border(1.dp, GlassBorder, RoundedCornerShape(24.dp))
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(if (isDark) MidnightBlue else IceBlue)
                             .padding(24.dp)
                     ) {
                         Text(
-                            text = currentNote.content,
+                            text = note?.content ?: "",
                             style = MaterialTheme.typography.bodyLarge.copy(
-                                color = Color.White.copy(alpha = 0.9f),
-                                lineHeight = 28.sp,
-                                letterSpacing = 0.5.sp
+                                color = if (isDark) Color.White.copy(alpha = 0.9f) else Slate900,
+                                lineHeight = 26.sp
                             )
                         )
                     }
-
-                    Spacer(modifier = Modifier.height(32.dp))
+                } else {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("NOTE NOT FOUND", color = NeonPink, fontWeight = FontWeight.Bold)
+                    }
                 }
             }
         }

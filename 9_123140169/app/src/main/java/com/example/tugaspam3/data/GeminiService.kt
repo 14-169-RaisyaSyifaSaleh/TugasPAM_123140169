@@ -1,56 +1,70 @@
 package com.example.tugaspam3.data
 
 import com.google.ai.client.generativeai.GenerativeModel
-import com.google.ai.client.generativeai.Chat
+import com.google.ai.client.generativeai.type.BlockThreshold
+import com.google.ai.client.generativeai.type.HarmCategory
+import com.google.ai.client.generativeai.type.SafetySetting
 import com.google.ai.client.generativeai.type.content
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
 
-class GeminiService(private val generativeModel: GenerativeModel) {
-
-    private var chatSession: Chat? = null
-
-    private val systemPrompt = """
-        Anda adalah "Asisten Catatan AI" yang profesional dan ramah.
-        Tugas Anda adalah membantu pengguna mengelola catatan dalam Bahasa Indonesia.
+/**
+ * Service class to handle Gemini AI operations.
+ * Implements AI integration and Prompt Engineering requirements.
+ */
+class GeminiService(apiKey: String) {
+    
+    // System instruction to guide the AI's behavior
+    private val systemInstruction = """
+        You are a helpful and intelligent Personal Note Assistant. 
+        Your goal is to help users manage, understand, and improve their personal notes.
+        When a user provides a note, you can summarize it, explain complex parts, 
+        suggest improvements, or answer questions based on the note's content.
         
-        Aturan Jawaban:
-        1. Gunakan Bahasa Indonesia yang baik dan benar.
-        2. Jika diminta meringkas, gunakan format poin-poin (bullet points).
-        3. Jika memperbaiki tata bahasa, jelaskan bagian mana yang diperbaiki.
-        4. Selalu berikan respon yang mendukung produktivitas.
+        Keep your responses:
+        1. Concise and relevant.
+        2. Professional yet friendly.
+        3. Structured (use bullet points if necessary).
+        
+        If the user asks something unrelated to the note or productivity, 
+        politely guide them back to the topic of their notes.
     """.trimIndent()
 
-    // Bonus: Streaming Response untuk Ringkasan
-    fun summarizeNoteStream(content: String): Flow<String> {
-        val prompt = "$systemPrompt\n\nTolong buatkan ringkasan dari catatan berikut:\n\n$content"
-        return generativeModel.generateContentStream(prompt).map { it.text ?: "" }
-    }
-
-    // Bonus: Multi-turn Conversation (Chat)
-    fun startNewSession(noteContent: String): Chat {
-        val history = listOf(
-            content(role = "user") { text("Ini adalah catatan saya: $noteContent") },
-            content(role = "model") { text("Siap! Saya sudah memahami catatan Anda. Ada yang bisa saya bantu terkait catatan ini?") }
+    private val generativeModel = GenerativeModel(
+        modelName = "gemini-1.5-flash",
+        apiKey = apiKey,
+        systemInstruction = content { text(systemInstruction) },
+        safetySettings = listOf(
+            SafetySetting(HarmCategory.HARASSMENT, BlockThreshold.MEDIUM_AND_ABOVE),
+            SafetySetting(HarmCategory.HATE_SPEECH, BlockThreshold.MEDIUM_AND_ABOVE),
+            SafetySetting(HarmCategory.SEXUALLY_EXPLICIT, BlockThreshold.MEDIUM_AND_ABOVE),
+            SafetySetting(HarmCategory.DANGEROUS_CONTENT, BlockThreshold.MEDIUM_AND_ABOVE)
         )
-        chatSession = generativeModel.startChat(history)
-        return chatSession!!
-    }
+    )
 
-    fun sendMessageStream(message: String): Flow<String> {
-        val session = chatSession ?: throw IllegalStateException("Chat session belum dimulai")
-        return session.sendMessageStream(message).map { it.text ?: "" }
-    }
-
-    // Legacy support for non-streaming if needed
-    suspend fun summarizeNote(content: String): Result<String> = withContext(Dispatchers.IO) {
-        try {
-            val response = generativeModel.generateContent("$systemPrompt\n\nRingkaslah:\n$content")
-            Result.success(response.text ?: "Gagal memproses teks.")
+    /**
+     * Summarizes the note content.
+     */
+    suspend fun summarizeNote(content: String): String? {
+        val prompt = "Please summarize this note accurately: \n\n$content"
+        return try {
+            val response = generativeModel.generateContent(prompt)
+            response.text
         } catch (e: Exception) {
-            Result.failure(e)
+            null
         }
+    }
+
+    /**
+     * Starts a multi-turn conversation about a specific note.
+     * Bonus: Multi-turn conversation and Streaming response.
+     */
+    fun chatWithNote(history: List<Pair<String, String>>, message: String): Flow<String> {
+        val chat = generativeModel.startChat(
+            history = history.map { (role, text) ->
+                content(role) { text(text) }
+            }
+        )
+        return chat.sendMessageStream(message).map { it.text ?: "" }
     }
 }

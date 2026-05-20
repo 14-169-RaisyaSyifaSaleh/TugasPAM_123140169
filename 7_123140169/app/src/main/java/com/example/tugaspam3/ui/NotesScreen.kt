@@ -36,6 +36,7 @@ import com.example.tugaspam3.viewmodel.NotesViewModel
 @Composable
 fun NotesScreen(
     viewModel: NotesViewModel,
+    isOffline: Boolean = false,
     onNoteClick: (Long) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -109,17 +110,21 @@ fun NotesScreen(
                 }
                 
                 IconButton(
-                    onClick = { viewModel.syncNotes() },
+                    onClick = { if (!isOffline) viewModel.syncNotes() },
+                    enabled = !isOffline,
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
                         .padding(end = 24.dp)
                         .clip(RoundedCornerShape(12.dp))
-                        .background(if (isDark) MidnightBlue else IceBlue)
+                        .background(
+                            if (isOffline) (if (isDark) MidnightBlue.copy(alpha = 0.5f) else IceBlue.copy(alpha = 0.5f))
+                            else (if (isDark) MidnightBlue else IceBlue)
+                        )
                 ) {
                     Icon(
                         imageVector = Icons.Default.Refresh,
                         contentDescription = "Sync",
-                        tint = AuroraGreen,
+                        tint = if (isOffline) AuroraGreen.copy(alpha = 0.3f) else AuroraGreen,
                         modifier = Modifier.rotate(if (isSyncing) rotation else 0f)
                     )
                 }

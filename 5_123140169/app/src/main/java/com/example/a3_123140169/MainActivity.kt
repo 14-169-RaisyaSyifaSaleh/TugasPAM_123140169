@@ -39,7 +39,7 @@ import com.example.a3_123140169.ui.theme._3_123140169Theme
 
 sealed class Screen(val route: String, val title: String, val icon: ImageVector, val selectedIcon: ImageVector) {
     object Notes : Screen("notes", "Notes", Icons.Rounded.Description, Icons.Rounded.Description)
-    object Favorites : Screen("favorites", "Favorites", Icons.Rounded.Bookmarks, Icons.Rounded.Bookmarks)
+     object Favorites : Screen("favorites", "Favorites", Icons.Rounded.Bookmarks, Icons.Rounded.Bookmarks)
     object Profile : Screen("profile", "Profile", Icons.Rounded.AccountCircle, Icons.Rounded.AccountCircle)
 }
 
